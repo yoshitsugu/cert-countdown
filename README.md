@@ -1,6 +1,6 @@
 # Certificate Expire Date Count Down
 
-count down to expire specific ssl/tls certificate
+countdown the day when the certificate expires
 
 ## Usage
 
@@ -14,3 +14,4 @@ count down to expire specific ssl/tls certificate
 $ cert-countdown github.com
 188
 ```
+In this case 188 days left before expire.
