@@ -1,6 +1,6 @@
 # Certificate Expire Date Count Down
 
-countdown the day when the certificate expires
+countdown days until the certificate expires
 
 ## Usage
 
@@ -14,4 +14,4 @@ countdown the day when the certificate expires
 $ cert-countdown github.com
 188
 ```
-In this case 188 days left before expire.
+In this case 188 days left before expiration.
