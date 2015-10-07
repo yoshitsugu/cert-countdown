@@ -19,20 +19,21 @@ import Control.Exception (bracketOnError)
 import System.Environment (getArgs)
 import qualified Data.ByteString.Char8 as B
 
-openConnection s p = do
+httpsPort :: Int
+httpsPort = 443
+
+-- Reference: https://github.comconnectvincenthz/hs-tls/blob/master/debug/src/RetrieveCertificate.hs
+
+getCertificateChainFromRemote :: Network.Socket.HostName -> IO CertificateChain
+getCertificateChainFromRemote s = do
     ref <- newIORef Nothing
-    let params = (defaultParamsClient s (B.pack p))
+    let params = (defaultParamsClient s $ B.pack $ show httpsPort)
                     { clientSupported = def { supportedCiphers = ciphersuite_all }
                     , clientShared    = def { sharedValidationCache = noValidate }
                     }
-
-    pn <- if and $ map isDigit $ p
-            then return $ fromIntegral $ (read p :: Int)
-            else servicePort <$> getServiceByName p "tcp"
     he <- getHostByName s
-
     sock <- bracketOnError (socket AF_INET Stream defaultProtocol) sClose $ \sock -> do
-            connect sock (SockAddrInet pn (head $ hostAddresses he))
+            connect sock (SockAddrInet (fromIntegral $ httpsPort) (head $ hostAddresses he))
             return sock
     ctx <- contextNew sock params
 
@@ -54,7 +55,7 @@ diffDays x y = (fromIntegral $ T.timeDiff x y) `div` (24 * 3600)
 main :: IO ()
 main = do
   (host:_) <- getArgs
-  (CertificateChain certs) <- openConnection host "443"
+  (CertificateChain certs) <- getCertificateChainFromRemote host
   let expireTime = snd . certValidity . getCertificate $ head certs
   currentTime <- dateCurrent
   print $ diffDays expireTime currentTime

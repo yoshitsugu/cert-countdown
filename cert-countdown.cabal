@@ -1,9 +1,8 @@
-name:                cert-count-down
+name:                cert-countdown
 version:             0.1.0.0
 synopsis:            Count down to expire certification
 description:         Count down to expire certification
 homepage:            https://github.com/yoshitsugu/cert-count-down
-source:              https://github.com/yoshitsugu/cert-count-down
 license:             BSD3
 license-file:        LICENSE
 author:              yoshitsugu
@@ -13,7 +12,7 @@ category:            Monitor
 build-type:          Simple
 cabal-version:       >=1.10
 
-executable cert-count-down
+executable cert-countdown
   hs-source-dirs:      src
   main-is:             Main.hs
   default-language:    Haskell2010
