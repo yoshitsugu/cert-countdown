@@ -6,12 +6,14 @@ countdown days until the certificate expires
 
 + prepare stack (https://github.com/commercialhaskell/stack)
 + clone this repository
-+ ``$ stack install``
-+ ``$ cert-countdown (domain name)``
++ ``$ stack build``
++ ``$ stack exec -- cert-countdown (domain name1) (domain name2) ...``
 
 ## Example
 ```
-$ cert-countdown github.com
-188
+$ stack exec -- cert-countdown github.com google.com hackage.haskell.org
+hackage.haskell.org: 803
+google.com: 68
+github.com: 103
 ```
-In this case 188 days left before expiration.
+The number right side of domain name means remaining days from expiration.

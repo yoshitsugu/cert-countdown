@@ -24,4 +24,6 @@ executable cert-countdown
                        x509-validation >= 1.6.3 && < 1.7.0,
                        x509 >= 1.6.3 && < 1.7.0,
                        x509-system >= 1.6.1 && < 1.7.0,
-                       hourglass >= 0.2.9 && < 0.3.0
+                       hourglass >= 0.2.9 && < 0.3.0,
+                       async
+  ghc-options:         -threaded -rtsopts

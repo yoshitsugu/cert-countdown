@@ -1,28 +1,33 @@
+{-# LANGUAGE BangPatterns #-}
+
+
 module Main where
 
-import Network.TLS
-import Network.TLS.Extra.Cipher
-import Network.BSD
-import Network.Socket
+import           Network.BSD
+import           Network.Socket
+import           Network.TLS
+import           Network.TLS.Extra.Cipher
 
-import Data.IORef
-import Data.Char (isDigit)
-import Data.Default.Class
-import Data.X509 as X509
-import Data.X509.Validation
-import System.X509
-import System.Hourglass
-import Data.Hourglass.Types
-import qualified Data.Hourglass as T
+import           Data.Char                (isDigit)
+import           Data.Default.Class
+import qualified Data.Hourglass           as T
+import           Data.Hourglass.Types
+import           Data.IORef
+import           Data.X509                as X509
+import           Data.X509.Validation
+import           System.Hourglass
+import           System.X509
 
-import Control.Exception (bracketOnError)
-import System.Environment (getArgs)
-import qualified Data.ByteString.Char8 as B
+import           Control.Exception        (bracketOnError)
+import qualified Data.ByteString.Char8    as B
+import           System.Environment       (getArgs)
+
+import           Control.Concurrent.Async
 
 httpsPort :: Int
 httpsPort = 443
 
--- Reference: https://github.comconnectvincenthz/hs-tls/blob/master/debug/src/RetrieveCertificate.hs
+-- Reference: https://github.com/vincenthz/hs-tls/blob/master/debug/src/RetrieveCertificate.hs
 
 getCertificateChainFromRemote :: Network.Socket.HostName -> IO CertificateChain
 getCertificateChainFromRemote s = do
@@ -54,8 +59,13 @@ diffDays x y = (fromIntegral $ T.timeDiff x y) `div` (24 * 3600)
 
 main :: IO ()
 main = do
-  (host:_) <- getArgs
-  (CertificateChain certs) <- getCertificateChainFromRemote host
-  let expireTime = snd . certValidity . getCertificate $ head certs
-  currentTime <- dateCurrent
-  print $ diffDays expireTime currentTime
+  hosts <- getArgs
+  !currentTime <- dateCurrent
+  as <- mapM (async . printEachCount currentTime) hosts
+  mapM_ wait as
+
+  where
+    printEachCount current host  = do
+      (CertificateChain !certs) <- getCertificateChainFromRemote host
+      let !expireTime = snd . certValidity . getCertificate $ head certs
+      putStrLn $ host ++ ": " ++ (show $ diffDays expireTime current)
